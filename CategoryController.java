@@ -47,15 +47,24 @@ public class CategoryController {
 		 */
 
 		@RequestMapping(value = "/addcat", method = RequestMethod.POST)
-		public String addCate(@ModelAttribute("category") Category category, BindingResult result,
-				HttpServletRequest request) {
-			categoryDAO.save(category);
+		public String addCate(@ModelAttribute("category") Category cate) {
+			if (cate.getCat_id() == 0) {
+				// new category, add it
 
-			System.out.println("adding category controller");
+				categoryDAO.save(cate);
+				System.out.println("adding of new category in controller");
+			} else {
+				// existing category, call update
 
-			return "adminhome";
+				categoryDAO.update(cate);
+				System.out.println("addsup update method of category in controller");
+			}
+
+			return "redirect:/addcategory";
 
 		}
+
+		
 
 		/* delete category... */
 		@RequestMapping(value = "/deletecategory{id}")
@@ -74,6 +83,18 @@ public class CategoryController {
 
 			System.out.println("delete Id:" + id);
 
+			return mv;
+
+		}
+
+		@RequestMapping(value = "/editcategory{id}")
+		public ModelAndView updateCatPage(@PathVariable("id") String id, Model model) throws Exception {
+			int i = Integer.parseInt(id);
+
+			model.addAttribute("category", categoryDAO.get(i));
+			model.addAttribute("CategoryList", categoryDAO.list());
+			System.out.println("edit category in controller");
+			ModelAndView mv = new ModelAndView("addcategory");
 			return mv;
 
 		}

@@ -140,22 +140,13 @@ public class ProductController {
 			}
 		}
 
-		// category = categoryDAO.get(prod.getCategory().getCat_name());
-		// categoryDAO.save(category);
-
-		// supplier = supplierDAO.get(prod.getSupplier().getSupplier_name());
-		// supplierDAO.savOrUpdate(supplier);
-
-		// prod.setSupplier(supplier);
-		// prod.setCategory(category);
-
-		/*
-		 * prod.setCat_id(12); prod.setSupplier_id(37); Supplier sup=new
-		 * Supplier(); product.setSupplier(sup);
-		 * 
-		 * Category cat=new Category(); product.setCategory(cat);
-		 */
-		productDAO.savOrUpdate(prod);
+		if (prod.getProd_id() == 0) {
+			//new product
+		productDAO.savOrUpdate(prod);}
+		else{
+			productDAO.savOrUpdate(prod);
+			return "addproduct";
+		}
 
 		model.addAttribute("message", "product added successfully");
 		model.addAttribute("productList", productDAO.list());
@@ -179,6 +170,21 @@ public class ProductController {
 		Gson gson = new Gson();
 		result = gson.toJson(plist);
 		return result;
+	}
+	@RequestMapping(value = "/editproducts{id}")
+	public ModelAndView updateProdPage(@PathVariable("id") String id, Model model) throws Exception {
+		int i = Integer.parseInt(id);
+
+		model.addAttribute("product", productDAO.get(i));
+		
+		model.addAttribute("productList", productDAO.list());
+		model.addAttribute("supplierList", supplierDAO.list());
+		model.addAttribute("categoryList", categoryDAO.list());
+		
+		System.out.println("edit product in controller");
+		ModelAndView mv = new ModelAndView("addproduct");
+		return mv;
+
 	}
 
 }

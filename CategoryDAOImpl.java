@@ -7,16 +7,19 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.suman.ecom.model.Category;
-import com.suman.ecom.model.Product;
 
 @Repository("categoryDAO")
 // @EnableTransactionManagement
 
 public class CategoryDAOImpl implements CategoryDAO {
+
+	@Autowired
+	Category category;
 
 	/* @Autowired */
 	SessionFactory sessionFactory;
@@ -102,6 +105,24 @@ public class CategoryDAOImpl implements CategoryDAO {
 
 			return true;
 		} catch (HibernateException e) {
+			e.printStackTrace();
+			return false;
+		}
+
+	}
+
+	@Transactional
+	public boolean update(Category category) {
+
+		try {
+			Session s = sessionFactory.getCurrentSession();
+			Transaction tx = s.beginTransaction();
+			s.update(category);
+			System.out.println("update category in impl");
+			tx.commit();
+			return true;
+		} catch (HibernateException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
 		}
