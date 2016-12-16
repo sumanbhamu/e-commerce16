@@ -21,7 +21,7 @@
 
 					<td><img src="resources/images/${product.prod_name}.jpg"
 						style="height: 100px; width: 100px;"></td>
-					<td><a href="cart">Add to cart</a></td>
+					<td><a href="buy${user_id}&${prod_id}">Add to cart</a></td>
 				</tr>
 
 			</table>
