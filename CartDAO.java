@@ -13,11 +13,11 @@ public interface CartDAO {
 
 	public Cart getbyid(int id);
 	
-	/*public List<Cart> mycartproducts(String id);*/
+	public List<Cart> listcartproducts(int id);
 	
-	public int totalproducts(String id);
+	public int totalproducts(int id);
 
-	public int totalprice(String id);
+	public int totalprice(int id);
 	
 	/*public boolean orphanremoval(String id);*/
 	

@@ -14,6 +14,9 @@ import com.suman.ecom.model.Cart;
 public class CartDAOImpl implements CartDAO {
 	@Autowired
 	ProductDAO productDAO;
+	
+	@Autowired
+	UserDAO userDAO;
 
 	@Autowired
 	private SessionFactory sessionFactory;
@@ -73,7 +76,7 @@ public class CartDAOImpl implements CartDAO {
 	@Transactional
 	public Cart getbyid(int id) {
 		try {
-			String hql = "from Cart where id=" + "'" + id + "'";
+			String hql = "from Cart user_id where id=" + id;
 			Session s = sessionFactory.getCurrentSession();
 			Transaction tx = s.beginTransaction();
 			org.hibernate.Query query = s.createQuery(hql);
@@ -90,13 +93,27 @@ public class CartDAOImpl implements CartDAO {
 			return null;
 		}
 	}
-
-	public int totalproducts(String id) {
-		// TODO Auto-generated method stub
-		return 0;
+@Transactional
+	public int totalproducts(int id) {
+		try {
+			String hql = "from Cart where user_id=" + "'" + id + "'";
+			Session s = sessionFactory.getCurrentSession();
+			Transaction tx = s.beginTransaction();
+			org.hibernate.Query query = s.createQuery(hql);
+			List<Cart> all = query.list();
+			tx.commit();
+			int k = 0;
+			for (Cart temp : all) {
+				k = k + 1;
+			}
+			return k;
+		} catch (HibernateException e) {
+			e.printStackTrace();
+			return 0;
+		}
 	}
 
-	public int totalprice(String id) {
+	public int totalprice(int id) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
@@ -116,6 +133,22 @@ public class CartDAOImpl implements CartDAO {
 			return null;
 		}
 
+	}
+
+
+	public List<Cart> listcartproducts(int id) {
+		try {
+			String hql = "from Cart where user_id=" + id;
+			Session s = sessionFactory.getCurrentSession();
+			Transaction tx = s.beginTransaction();
+			org.hibernate.Query query = s.createQuery(hql);
+			List<Cart> all = query.list();
+			tx.commit();
+			return all;
+		} catch (HibernateException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 }
