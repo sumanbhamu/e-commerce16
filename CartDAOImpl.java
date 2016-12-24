@@ -32,9 +32,12 @@ public class CartDAOImpl implements CartDAO {
 	public boolean save(Cart cart) {
 		try {
 			Session s = sessionFactory.getCurrentSession();
-			Transaction tx = s.beginTransaction();
-			s.save(cart);
-			tx.commit();
+			Transaction t = s.beginTransaction();
+			s.saveOrUpdate(cart);
+			t.commit();
+			//sessionFactory.getCurrentSession().save(cart);
+			System.out.println("saving into cart...impl");
+			
 			return true;
 		} catch (HibernateException e) {
 
@@ -76,16 +79,17 @@ public class CartDAOImpl implements CartDAO {
 	@Transactional
 	public Cart getbyid(int id) {
 		try {
-			String hql = "from Cart user_id where id=" + id;
+			String hql = "from Cart where user_id=" + id;
 			Session s = sessionFactory.getCurrentSession();
 			Transaction tx = s.beginTransaction();
 			org.hibernate.Query query = s.createQuery(hql);
 			List<Cart> list = query.list();
 			tx.commit();
-			if (list == null)
-
-				return null;
+			if (list == null){
+				return null;}
 			else {
+				System.out.println("getting by id product.......in impl");
+
 				return list.get(0);
 			}
 		} catch (HibernateException e) {
@@ -96,7 +100,7 @@ public class CartDAOImpl implements CartDAO {
 @Transactional
 	public int totalproducts(int id) {
 		try {
-			String hql = "from Cart where user_id=" + "'" + id + "'";
+			String hql = "from Cart where user_id=" +id;
 			Session s = sessionFactory.getCurrentSession();
 			Transaction tx = s.beginTransaction();
 			org.hibernate.Query query = s.createQuery(hql);
@@ -106,6 +110,7 @@ public class CartDAOImpl implements CartDAO {
 			for (Cart temp : all) {
 				k = k + 1;
 			}
+			System.out.println("total products in ......impl");
 			return k;
 		} catch (HibernateException e) {
 			e.printStackTrace();
@@ -138,12 +143,13 @@ public class CartDAOImpl implements CartDAO {
 
 	public List<Cart> listcartproducts(int id) {
 		try {
-			String hql = "from Cart where user_id=" + id;
+			String hql = "from Cart where user_id=" +id;
 			Session s = sessionFactory.getCurrentSession();
 			Transaction tx = s.beginTransaction();
 			org.hibernate.Query query = s.createQuery(hql);
 			List<Cart> all = query.list();
 			tx.commit();
+			System.out.println("listing cart product.......in impl");
 			return all;
 		} catch (HibernateException e) {
 			e.printStackTrace();

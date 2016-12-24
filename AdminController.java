@@ -1,5 +1,6 @@
 package com.suman.Controller;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
@@ -8,8 +9,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -55,7 +54,7 @@ public class AdminController {
 		int s = Integer.parseInt(id);
 
 		ModelAndView mv = new ModelAndView("mycart");
-		mv.addObject("mycartList", cartDAO.listcartproducts(s));
+		mv.addObject("cartList", cartDAO.listcartproducts(s));
 		// mv.addObject("cartprice", cartDAO.totalprice(id));
 		return mv;
 	}
@@ -75,77 +74,106 @@ public class AdminController {
 	}
 
 	@RequestMapping(value = "/buy{pid}", method = RequestMethod.POST)
-	public ModelAndView buyproductPage(@Valid @PathVariable("pid") int pid, @ModelAttribute("cart") Cart car,
-			BindingResult result, HttpSession session) throws Exception {
+	public ModelAndView buyproductPage(@Valid @PathVariable("pid") int pid,Model model,
+			HttpServletRequest request) {
+		
+		model.addAttribute("cart",new Cart());
 
-		// String nam = user.getEmailid();
-		// userDAO.get(nam);
-		// System.out.println("nammmm"+nam);
-		String name = user.getUsername();
+		HttpSession session = request.getSession(false);
+		//String email1 = (String) session.getAttribute("email");
 
-		// String loggedInUserId=(String) session.getAttribute(name);
-		String loggedInUserId = (String) SecurityContextHolder.getContext().getAuthentication().getName();
-
-		System.out.println("loggedinuserid===" + loggedInUserId + ".....");
-
-		if (loggedInUserId == "anonymousUser") {
-			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			loggedInUserId = auth.getName();
+		String name1 = (String) session.getAttribute("loggedInUser");
+		
+		
+		if (name1 == null) {
 
 			ModelAndView mv = new ModelAndView("test");
 			System.out.println("........check .login user");
 
 			return mv;
 		}
+		
+		int x1=(Integer)session.getAttribute("loggedInUserID");
+		
+		product = productDAO.get(pid);
+		session.setAttribute("ppprice", product.getProd_price());
+		int pprice=(Integer)session.getAttribute("ppprice");
+		
+		/*int cartsize=cartDAO.listcartproducts(x1).size();
+			if(cartsize==0)
+			{
+				model.addAttribute("errormessage","u do not hv any products in cart!!!!");
+			}
+		*/	
+		
+			
+			cart.setQuantity(2);
+			cart.setProd_id(pid);
+			cart.setUser_id(x1);
+			cart.setCartuser(userDAO.getbyid(x1));
+			cart.setCartproduct(product);
+			cart.setPrice(pprice);
 
-		else {
-			ModelAndView mv = new ModelAndView("redirect:/mycart");
+			cartDAO.save(cart);
+			
 
-			cartDAO.save(car);
-			
-			car.setQuantity(2);
-			
-			System.out.println("ading to 1cartttttttt..."+car.getQuantity());
-			car.setProd_id(pid);
-			
-			System.out.println("ading to 2cartttttttt.."+pid);
-			
-			//userDAO.checksignin(name);
-			//user.getUser_id()
-			
-			car.setUser_id(cart.getUser_id());
-					
+			System.out.println("ading to 1cartttttttt..." + cart.getQuantity());
+			System.out.println("loggedinuserid===" + "....x..."+x1 + ".........apple." + name1);
+			System.out.println("ading to 2cartttttttt.." + pid);
+			System.out.println("ading to 3cartttttttt..." + x1 + "\t ");
+						
+			System.out.println("price...."+ product.getProd_price()+"."
+					+ ".....\n............pprice..."+pprice);
 
-			session.setAttribute("loggedInUser", user.getUsername());
-
-			//session.getAttribute(loggedInUser);
-			System.out.println("ading to 3cartttttttt..."+cart.getUser_id()+"\t "+session.getAttribute(loggedInUserId));
-
-			car.setCartuser(user);
 			
-			product = productDAO.get(pid);
-			car.setCartproduct(product);
 			
-			car.setPrice(car.getQuantity() * product.getProd_price());
 
+			
+			session.setAttribute("cartpic11",
+					 cart.getCartproduct().getProd_name());
+			System.out.println("cartpic...."+cart.getCartproduct().getProd_name());
 			
 			System.out.println("ading to cart");
-
-			mv.addObject("mycartList", cartDAO.listcartproducts(pid));
-			session.setAttribute("cartvalue", cartDAO.totalproducts(pid));
-			// mv.addObject("cartprice", cartDAO.totalprice(pid));
-			// mv.addObject("cartmessage",
-			// cart.getCartproduct().getProd_name());
-			mv.addObject("cartmessage1", " has been added to your cart");
+			
+			//model.addAttribute("getList",cartDAO.getbyid(x1));
+			/*model.addAttribute("cartList"+cartDAO.listcartproducts(x1));
+			model.addAttribute("productList", productDAO.list());
+			model.addAttribute("userList", userDAO.list());
+			*/
+			ModelAndView mv = new ModelAndView("mycart");
+			
+			
+			
+			
+			/*mv.addObject("productList", productDAO.list());
+			mv.addObject("userList", userDAO.list());
+			*/model.addAttribute("productList", productDAO.list());
+			
+			
+			
+			//session.setAttribute("cartvalue1", cartDAO.totalproducts(x1));
+			mv.addObject("cartvalue",cartDAO.totalproducts(x1));
+			mv.addObject("cartList",cartDAO.listcartproducts(x1));
+			
+			
+			/*Cart cart1 = cartDAO.getbyid(x1);*/
+			/*model.addAttribute("displayCart",true);
+			*/
+			/*System.out.println(".....SUMAN......"+cartDAO.listcartproducts(x1));
+			
+			System.out.println("suman..........get..."+cartDAO.getbyid(x1));
+			*/
+			//mv.addObject("cartmessage1", " has been added to your cart");
+			
+			
 			return mv;
 
-		}
 	}
 
 	@RequestMapping(value = "/mycart{id}")
-	public ModelAndView viewmycart1(@PathVariable("id") String id) {
+	public ModelAndView viewmycart1(@PathVariable("id") int id) {
 		ModelAndView mv = new ModelAndView("mycart");
-		// mv.addObject("mycartList", cartDAO.listcartproducts(id));
+		 mv.addObject("cartList", cartDAO.listcartproducts(id));
 		// mv.addObject("cartprice", cartDAO.totalprice(id));
 		return mv;
 
